@@ -1,17 +1,16 @@
-# LEDクラスの定義（デジタル出力を使用）
+# LEDクラスの定義
 class LED
-  def initialize(pin)
-    @pin = pin
-    GPIO.pinMode(@pin, GPIO::OUTPUT)
+  def initialize(pin_number)
+    @pin = GPIO.new(pin_number, GPIO::OUT)
     off
   end
 
   def on
-    GPIO.digitalWrite(@pin, GPIO::HIGH)
+    @pin.write(1)
   end
 
   def off
-    GPIO.digitalWrite(@pin, GPIO::LOW)
+    @pin.write(0)
   end
 end
 
@@ -24,9 +23,9 @@ class Illumination
   # 全てのLEDを同時に点滅させるパターン
   def blink_pattern(count)
     count.times do
-      @leds.each_value(&:on)
+      @leds.each { |_, led| led.on }
       sleep 0.5
-      @leds.each_value(&:off)
+      @leds.each { |_, led| led.off }
       sleep 0.5
     end
   end
@@ -59,5 +58,7 @@ leds = {
 }
 illumination = Illumination.new(leds)
 
-# メインループ
+# パターンの実行
 illumination.run_all_patterns(2)
+
+puts "Illumination patterns completed"
